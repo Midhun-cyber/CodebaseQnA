@@ -27,8 +27,6 @@ def clone_repository(repo_url):
             return False, "Invalid GitHub Repository URL."
 
         os.makedirs(REPOSITORY_FOLDER, exist_ok=True)
-
-        # Repository name
         repo_name = repo_url.rstrip("/").split("/")[-1]
         destination = os.path.join(REPOSITORY_FOLDER, repo_name)
 
@@ -45,7 +43,6 @@ def clone_repository(repo_url):
             except Exception:
                 pass
 
-        # Clone repository
         Repo.clone_from(repo_url, destination)
 
         return True, "available"
@@ -67,7 +64,6 @@ def read_repository():
     if not os.path.exists(REPOSITORY_FOLDER):
         return files_data, 0
 
-    # Find the cloned repository
     repositories = [
         folder for folder in os.listdir(REPOSITORY_FOLDER)
         if os.path.isdir(os.path.join(REPOSITORY_FOLDER, folder))
@@ -77,11 +73,9 @@ def read_repository():
         return files_data, 0
 
     repo_path = os.path.join(REPOSITORY_FOLDER, repositories[0])
-
-    # Walk through all folders
     for root, dirs, files in os.walk(repo_path):
 
-        # Ignore hidden folders like .git
+
         dirs[:] = [
             d for d in dirs
             if not d.startswith(".")
@@ -123,8 +117,6 @@ def split_documents(files_data):
     """
 
     documents = []
-
-    # Convert every file into a LangChain Document
     for file in files_data:
 
         documents.append(
@@ -137,7 +129,6 @@ def split_documents(files_data):
             )
         )
 
-    # Create splitter
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=1000,
         chunk_overlap=200
@@ -147,11 +138,16 @@ def split_documents(files_data):
     chunks = splitter.split_documents(documents)
 
     return chunks, len(chunks)
+    
 def create_vector_store(chunks):
 
     from rag import get_embeddings
 
     embeddings = get_embeddings()
+    if os.path.exists("vector_store"):
+        shutil.rmtree("vector_store")
+
+    os.makedirs("vector_store", exist_ok=True)
 
     vector_db = FAISS.from_documents(
         documents=chunks,
