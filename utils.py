@@ -30,7 +30,6 @@ def clone_repository(repo_url):
         repo_name = repo_url.rstrip("/").split("/")[-1]
         destination = os.path.join(REPOSITORY_FOLDER, repo_name)
 
-        # If already cloned
         if os.path.exists(destination):
             return True, "cloned"
 
@@ -108,6 +107,7 @@ def read_repository():
                 })
 
     return files_data, len(files_data)
+    
 def split_documents(files_data):
     """
     Splits repository files into smaller chunks.
