@@ -9,7 +9,7 @@ from utils import (
 )
 from rag import search_repository
 from groqai import ask_llm,generate_readme
-# ---------------------- Page Configuration ----------------------
+
 st.set_page_config(
     page_title="CodebaseQ&A",
     page_icon="🤖",
@@ -63,7 +63,7 @@ div[data-testid="stVerticalBlock"] > div:first-child{
 
 </style>
 """, unsafe_allow_html=True)
-# ---------------------- Sidebar ----------------------
+
 with st.sidebar:
     st.title("CodebaseQ&A")
 
@@ -91,7 +91,6 @@ and answers questions using RAG.
 
     st.markdown("---")
 
-# ---------------------- Header ----------------------
 st.markdown("""
 <div style="text-align:center;
     color:#22D3EE;
@@ -107,16 +106,9 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ---------------------- Repository + Statistics ----------------------
-
 left, divider, right = st.columns([3, 0.05, 1])
 
-
-# ===========================================================
-# LEFT SIDE
-# ===========================================================
 with left:
-
     st.subheader("▣ Repository")
 
     repo_url = st.text_input(
@@ -138,7 +130,6 @@ with left:
                 success, message = clone_repository(repo_url)
 
             if success:
-                # Clear previous repository results
                 st.session_state.pop("answer", None)
                 st.session_state.pop("docs", None)
                 st.session_state.pop("sources", None)
@@ -148,31 +139,31 @@ with left:
                 log = ""
                 progress.markdown(log, unsafe_allow_html=True)
 
-                # ---------------- Repository ----------------
+                #Repository
                 if message == "cloned":
-                    log += "⏳ Cloning repository...<br>"
+                    log += " Cloning repository...<br>"
                 else:
-                    log += "⏳ Checking repository...<br>"
+                    log += " Checking repository...<br>"
 
                 progress.markdown(log, unsafe_allow_html=True)
 
                 if message == "cloned":
                     log = log.replace(
-                        "⏳ Cloning repository...<br>",
+                        " Cloning repository...<br>",
                         "✔ Repository cloned successfully.<br>"
                     )
                 else:
                     log = log.replace(
-                        "⏳ Checking repository...<br>",
+                        " Checking repository...<br>",
                         "✔ Repository already available.<br>"
                     )
 
                 progress.markdown(log, unsafe_allow_html=True)
 
-                # ---------------- Read ----------------
+                #Read
                 try:
 
-                    log += "⏳ Reading repository files...<br>"
+                    log += " Reading repository files...<br>"
                     progress.markdown(log, unsafe_allow_html=True)
 
                     files_data, total_files = read_repository()
@@ -202,7 +193,7 @@ with left:
                         st.session_state.language = "Unknown"
 
                     log = log.replace(
-                        "⏳ Reading repository files...<br>",
+                        " Reading repository files...<br>",
                         "✔ Repository files loaded successfully.<br>"
                     )
 
@@ -210,19 +201,19 @@ with left:
 
                 except Exception as e:
 
-                    progress.error(f"❌ Failed to read repository.\n\n{e}")
+                    progress.error(f" Failed to read repository.\n\n{e}")
                     st.stop()
 
-                # ---------------- Split ----------------
+                #Split
                 try:
 
-                    log += "⏳ Splitting documents...<br>"
+                    log += " Splitting documents...<br>"
                     progress.markdown(log, unsafe_allow_html=True)
 
                     chunks, total_chunks = split_documents(files_data)
 
                     log = log.replace(
-                        "⏳ Splitting documents...<br>",
+                        " Splitting documents...<br>",
                         "✔ Documents split successfully.<br>"
                     )
 
@@ -230,12 +221,12 @@ with left:
 
                 except Exception as e:
 
-                    progress.error(f"❌ Failed to split documents.\n\n{e}")
+                    progress.error(f"Failed to split documents.\n\n{e}")
                     st.stop()
 
-                # ---------------- Embeddings ----------------
+                #Embeddings
                 try:
-                    with st.spinner("⏳ Creating embeddings..."):
+                    with st.spinner(" Creating embeddings..."):
                      create_vector_store(chunks)
                     from rag import get_vector_store
                     get_vector_store.clear()
@@ -245,10 +236,10 @@ with left:
 
                 except Exception as e:
 
-                    progress.error(f"❌ Failed to create embeddings.\n\n{e}")
+                    progress.error(f"Failed to create embeddings.\n\n{e}")
                     st.stop()
 
-                # ---------------- Finish ----------------
+                #Finish
                 st.session_state.total_files = total_files
                 st.session_state.total_chunks = total_chunks
                 st.session_state.status = "Indexed"
@@ -263,9 +254,7 @@ with left:
         else:
 
             st.warning("Please enter a GitHub repository URL.")
-# ===========================================================
-# RIGHT SIDE
-# ===========================================================
+            
 with right:
 
     st.subheader("◉ Statistics")
@@ -301,7 +290,7 @@ with right:
     )
 
 st.divider()
-# ---------------------- Chat ----------------------
+#AskAI
 st.subheader("➜ Ask Repository")
 
 question = st.text_input(
@@ -338,7 +327,7 @@ if st.button(" Ask AI", use_container_width=True):
     else:
         st.warning("Please enter a question.")
 
-# ---------------------- Response ----------------------
+#Response
 st.subheader("✦ AI Response")
 
 with st.container(border=True):
@@ -350,9 +339,9 @@ with st.container(border=True):
             st.subheader("◆ Source Files")
 
             for file in st.session_state.sources:
-                st.markdown(f"✅ `{file}`")
+                st.markdown(f"✔ `{file}`")
 
-        # ---------------------- Relevant Code ----------------------
+        #Relevant Code
         if "docs" in st.session_state:
             st.subheader("⌬ Relevant Code")
 
@@ -394,10 +383,10 @@ with st.container(border=True):
     else:
         st.info("Ask a question about the repository.")
 st.divider()
-# ---------------------- README Generator ----------------------
+#README Generator
 st.subheader("◆ README Generator")
 
-if st.button("📝 Generate README", use_container_width=True):
+if st.button("➤ Generate README", use_container_width=True):
 
     try:
         files_data, _ = read_repository()
@@ -418,13 +407,13 @@ if st.button("📝 Generate README", use_container_width=True):
     except Exception as e:
         st.error(f"Failed to generate README.\n\n{e}")
 
-# Display README
+#Display README
 if "readme" in st.session_state:
 
     st.markdown(st.session_state.readme)
 
     st.download_button(
-        "📥 Download README.md",
+        "Download README.md",
         data=st.session_state.readme,
         file_name="README.md",
         mime="text/markdown"
