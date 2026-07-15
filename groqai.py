@@ -1,12 +1,16 @@
 import os
+import streamlit as st
 from groq import Groq
 from dotenv import load_dotenv
 
 load_dotenv()
 
-client = Groq(
-    api_key=os.getenv("GROQ_API_KEY")
-)
+api_key = os.getenv("GROQ_API_KEY")
+
+if api_key is None:
+    api_key = st.secrets["GROQ_API_KEY"]
+
+client = Groq(api_key=api_key)
 
 def ask_llm(question, context):
     prompt = f"""
