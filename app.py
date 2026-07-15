@@ -298,7 +298,7 @@ question = st.text_input(
     placeholder="Example: Where is the login implemented?"
 )
 
-if st.button(" Ask AI", use_container_width=True):
+if st.button(" Ask AI✦", use_container_width=True):
 
     if question.strip():
 
